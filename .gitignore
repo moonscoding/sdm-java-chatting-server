@@ -1,0 +1,8 @@
+### Git Ignore File ###
+
+### itelliJ ###
+*.iml
+.idea/
+
+### production ###
+out/
