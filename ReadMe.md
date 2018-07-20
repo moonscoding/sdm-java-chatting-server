@@ -14,47 +14,27 @@
 
 <!-- /code_chunk_output -->
 
-### Java Socket Server
+### 환경
 
-- NIO (Blocking)
-- ThreadPool
+##### 구현환경
 
-### 멀티룸구조
+- Mac OS X
+- Java 1.8
+- IntelliJ
 
-RoomManager
+##### 라이브러리
 
-```
-RoomManager -> Room(A)  -> Client(A)
-                        -> Client(B)
-                        -> Client(C)
-            -> Room(B)  -> Client(D)
-                        -> Client(E)
-                        -> Client(F)
-            -> Room(C)  -> Client(G)
-                        -> Client(H)
-                        -> Client(I)
-```
+- [json-parser]()
 
-ClientManager
+### NIO - Blocking 방식
 
-```
-ClientManager -> Client(A)
-              -> Client(B)
-              -> Client(C)
-              -> Client(D)
-              -> Client(E)
-              -> Client(F)
-              -> Client(G)
-              -> Client(H)
-              -> Client(I)
-```
+블로킹방식은 언제 데이터가 보내질지 모르기때문에 "accept()"와 "read()"에서 블로킹됩니다.
 
-### 추가기능
+그래서 스레드를 할당해야 합니다. 이런 방식을 해결하기 위해서 스레드풀을 사용하지만,
 
-- 채팅방 비밀번호 기능 (서버에서비교처리)
-- 방장기능 강퇴등등
-- 실시간 인원수 확인기능 
-- 블로킹서버와 넌블로킹서버의 비교
+연결된 client마다 "read()"에 스레드를 할당해야 한다는 점은 변하지 않습니다.
+
+> [NonBlocking Chatting 프로젝트 바로가기](https://github.com/moonscoding/sdm-java-chatting-server-nonblocking)
 
 
 ---
