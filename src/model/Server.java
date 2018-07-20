@@ -1,5 +1,6 @@
 package model;
 
+import util.Define;
 import util.Util;
 
 import java.io.IOException;
@@ -27,17 +28,14 @@ public class Server {
     /**
      * [ Method :: startServer ]
      *
-     * @DES ::
-     * @IP1 ::
-     * @O.P ::
-     * @S.E ::
+     * @DES :: 서버실행함수
+     * @S.E :: connect()로 연결
      * */
     public void startServer() {
 
-        // # 가용한 프로세서만큼 스레드 생성
-        executorService = Executors.newFixedThreadPool(
-                Runtime.getRuntime().availableProcessors()
-        );
+        // ### 가용한 프로세서만큼 스레드 생성 ###
+        executorService = Executors.newFixedThreadPool( Runtime.getRuntime().availableProcessors() ); // 4
+        executorService = Executors.newFixedThreadPool( 16 ); // 16
 
         try {
             serverSocketChannel = ServerSocketChannel.open();
@@ -46,7 +44,7 @@ public class Server {
             serverSocketChannel.configureBlocking(true);
 
             // ### bind(port) ###
-            serverSocketChannel.bind( new InetSocketAddress(8080) );
+            serverSocketChannel.bind( new InetSocketAddress(Define.port) );
             System.out.println("[채팅서버] 서버실행");
 
             // 스레드생성후 새로운소켓 계속감시
@@ -60,10 +58,8 @@ public class Server {
     /**
      * [ Method :: stopServer ]
      *
-     * @DES ::
-     * @IP1 ::
-     * @O.P ::
-     * @S.E ::
+     * @DES :: 서버종료함수
+     * @S.E :: 없음
      * */
     public void stopServer() {
         try {
@@ -87,7 +83,7 @@ public class Server {
      * [ Method :: connect ]
      *
      * @DES :: 스레드생성후 새로운소켓 계속감시 (스레드풀)
-     * @S.E :: 없음
+     * @S.E :: accept()를 처리하는 함수
      * */
     public void connect() {
         Runnable runnable = new Runnable() {

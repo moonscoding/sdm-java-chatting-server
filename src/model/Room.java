@@ -24,12 +24,10 @@ public class Room {
     }
 
     /**
-     * [ Method ::  ]
+     * [ Method :: entryRoom ]
      *
-     * @DES ::
-     * @IP1 ::
-     * @O.P ::
-     * @S.E ::
+     * @DES :: 방 들어가기
+     * @IP1 :: client {Client}
      * */
     public void entryRoom(Client client) {
         clients.add(client);
@@ -37,12 +35,11 @@ public class Room {
     }
 
     /**
-     * [ Method ::  ]
+     * [ Method :: leaveRoom ]
      *
-     * @DES ::
-     * @IP1 ::
-     * @O.P ::
-     * @S.E ::
+     * @DES :: 방 나가기
+     * @IP1 :: client {Client}
+     * @S.E :: 만약 방에 아무도 없다면 삭제처리
      * */
     public void leaveRoom(Client client) {
         this.clients.remove(client);

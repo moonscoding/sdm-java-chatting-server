@@ -1,13 +1,14 @@
 package model;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.Vector;
 
 public class RoomManager {
 
-    public List<Client> clients;
-    public List<Room> rooms;
-    public String roomStatus;
+    public List<Client> clients;    // 전체 Client
+    public List<Room> rooms;        // 전체 Room
+    public String roomStatus;       // 반환 Json -> String Room
 
     public RoomManager(List<Client> clients) {
         this.clients = clients;
@@ -18,31 +19,34 @@ public class RoomManager {
     /**
      * [ Method :: updateRoomStatus ]
      *
-     * @DES ::
-     * @IP1 ::
-     * @O.P ::
-     * @S.E ::
+     * @DES :: Client에 전달할 텍스트 처리하는 함수
+     * @S.E :: Json -> Text
      * */
     void updateRoomStatus() {
-        System.out.println("updateRoomStatus call");
+        // System.out.println("updateRoomStatus call");
         roomStatus = "[";
-        for (Room room : rooms) {
-            roomStatus += String.format("{\"id\":\"%s\",\"title\":\"%s\"}", room.id, room.title);
+        if(rooms.size() > 0) {
+            for (Room room : rooms) {
+                roomStatus += String.format("{\"id\":\"%s\",\"title\":\"%s\"},", room.id, room.title);
+            }
+            roomStatus = roomStatus.substring(0,roomStatus.length()-1);
         }
         roomStatus += "]";
-        System.out.println(roomStatus);
+         System.out.println("[채팅서버] " + roomStatus);
     }
 
     /**
-     * [ Method :: addRoom ]
+     * [ Method :: createRoom ]
      *
-     * @DES ::
-     * @IP1 ::
-     * @O.P ::
-     * @S.E ::
+     * @DES :: 새로운 방생성 함수
+     * @IP1 :: title {String}
+     * @IP1 :: client {Client}
+     * @S.E :: 모든 Client의 상태를 업데이트
      * */
     public void createRoom( String title, Client client ) {
-        Room newRoom = new Room(this, rooms.size() + title, rooms.size(), title);
+        // ### unique id ###
+        String uniqueID = UUID.randomUUID().toString();
+        Room newRoom = new Room(this, uniqueID, rooms.size(), title );
         rooms.add(newRoom);
 
         // #전달 - 모든 Client에게 상황보고
@@ -54,12 +58,11 @@ public class RoomManager {
     }
 
     /**
-     * [ Method :: addRoom ]
+     * [ Method :: destroyRoom ]
      *
-     * @DES ::
-     * @IP1 ::
-     * @O.P ::
-     * @S.E ::
+     * @DES :: 기존방 제거하는 함수
+     * @IP1 :: room {Room}
+     * @S.E :: 모든 Client의 상태를 업데이트
      * */
     public void destroyRoom(Room room) {
         rooms.remove(room);

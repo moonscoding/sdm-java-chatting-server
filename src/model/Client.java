@@ -33,10 +33,8 @@ public class Client {
     /**
      * [ Method :: receive ]
      *
-     * @DES ::
-     * @IP1 ::
-     * @O.P ::
-     * @S.E ::
+     * @DES :: 수신메소드 ( Json 데이터 수신 )
+     * @S.E :: "method" 타입별 분기 처리
      */
     void receive() {
         Runnable runnable = new Runnable() {
@@ -63,6 +61,7 @@ public class Client {
 
                             System.out.println("[채팅서버] 요청매소드 " + method);
                             switch (method) {
+                                // #방생성
                                 case "/room/create":
                                     if (room == null) {
                                         roomManager.createRoom( token.get("title").toString(), Client.this);
@@ -70,6 +69,7 @@ public class Client {
                                         Util.log("[채팅서버] 현재 채팅방 갯수 " + roomManager.rooms.size());
                                     }
                                     break;
+                                // #방입장
                                 case "/room/entry":
                                     if (room == null) {
                                         for (int i = 0; i < roomManager.rooms.size(); i++) {
@@ -81,28 +81,30 @@ public class Client {
                                         }
                                     }
                                     break;
+                                // #방탈출
                                 case "/room/leave":
                                     if (room != null) {
                                         Client.this.room.leaveRoom(Client.this);
                                         Util.log("[채팅서버] 채팅방 나감" + socketChannel.getRemoteAddress());
                                     }
                                     break;
+                                // #쳇전송
                                 case "/chat/send":
                                     if (room != null) {
                                         for (Client c : room.clients) {
-                                            if (c != Client.this) c.sendEcho("message");
+                                            if (c != Client.this) c.sendEcho(token.get("id").toString(), token.get("message").toString());
                                         }
                                     }
                                     break;
                                 default:
                                     Util.log("[채팅서버] 메소드가 올바르지 않습니다. : " + socketChannel.getRemoteAddress());
                             }
-                        } catch (Exception e) {
+                        } catch (Exception errA) {
                             // Todo 올바른 데이터 형식이 아닙니다.
-                            System.out.println(e);
+                            errA.printStackTrace();
                             Util.log("[채팅서버] 올바른 데이터 형식이 아닙니다. : " + socketChannel.getRemoteAddress());
                         }
-                    } catch (IOException errA) {
+                    } catch (IOException errB) {
                         terminate();
                         break;
                     }
@@ -116,9 +118,7 @@ public class Client {
      * [ Method :: sendStatus ]
      *
      * @DES :: entry & leave 의 상태에 따라 계속적으로 클라이언트에게 인원수 전송
-     * @IP1 ::
-     * @O.P ::
-     * @S.E ::
+     * @S.E :: "method" /room/status
      */
     void sendStatus() {
         Runnable runnable = new Runnable() {
@@ -146,18 +146,17 @@ public class Client {
      * [ Method :: sendEcho ]
      *
      * @DES :: 채팅내용을 같은 방에 있는 모든 유저에게 전달
-     * @IP1 ::
-     * @O.P ::
-     * @S.E ::
+     * @IP1 :: message {String}
+     * @S.E :: "method" /chat/echo
      */
-    void sendEcho(String message) {
+    void sendEcho(String id, String message) {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 try {
 
                     // ### write() ###
-                    String packet = String.format("{\"method\":\"%s\",\"message\":\"%s\"}", "/chat/echo", message);
+                    String packet = String.format("{\"method\":\"%s\",\"id\":\"%s\",\"message\":\"%s\"}", "/chat/echo", id, message);
                     Charset cs = Charset.forName("UTF-8");
                     ByteBuffer bb = cs.encode(packet);
                     socketChannel.write(bb);
@@ -172,6 +171,11 @@ public class Client {
         executorService.submit(runnable);
     }
 
+    /**
+     * [ Method :: terminate ]
+     *
+     * @DES :: Client 종료함수
+     */
     void terminate() {
         try {
             Util.log("[채팅서버] 통신두절 : " + socketChannel.getRemoteAddress());
